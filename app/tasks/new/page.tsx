@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createTaskSchema } from '@/app/validationSchemas';
 import { z } from 'zod';
+import ErrorMessage from '@/app/components/ErrorMessage';
 
 type TaskForm = z.infer<typeof createTaskSchema>;
 
@@ -36,13 +37,17 @@ const NewTaskPage = () => {
         }
       })}>
         <TextField.Root placeholder="Title" {...register('title')}/>
-        {errors.title && <Text color='red' as='p'>{errors.title.message}</Text>}
+          <ErrorMessage>
+            {errors.title?.message}
+          </ErrorMessage>
         <Controller 
           name='description'
           control={control}
           render={({ field }) => <SimpleMDE placeholder='Description' {...field}/>}
         />
-        {errors.description && <Text color='red' as='p'>{errors.description.message}</Text>}
+          <ErrorMessage>
+            {errors.description?.message}
+          </ErrorMessage>
         <Button>Submit New Task</Button>
       </form>
     </div>
