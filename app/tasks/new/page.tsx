@@ -22,6 +22,16 @@ const NewTaskPage = () => {
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post('/api/tasks', data);
+      router.push('/tasks')        
+    } catch (error) {
+      setIsSubmitting(false);
+      setError("An unexpected error has orrcured.")
+    }
+  })
 
   return (
     <div className='max-w-xl'>
@@ -29,17 +39,9 @@ const NewTaskPage = () => {
         <Callout.Text>{error}</Callout.Text>
       </Callout.Root>}
       <form 
-      className='space-y-3' 
-      onSubmit={handleSubmit(async (data) => {
-        try {
-          setIsSubmitting(true);
-          await axios.post('/api/tasks', data);
-          router.push('/tasks')        
-        } catch (error) {
-          setIsSubmitting(false);
-          setError("An unexpected error has orrcured.")
-        }
-      })}>
+        className='space-y-3' 
+        onSubmit={onSubmit}
+      >
         <TextField.Root placeholder="Title" {...register('title')}/>
           <ErrorMessage>
             {errors.title?.message}
