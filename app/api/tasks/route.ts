@@ -14,3 +14,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newTask, { status: 201 });
 }
+
+export async function GET() {
+    try {
+      const tasks = await prisma.task.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+      return NextResponse.json(tasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
+    }
+  }

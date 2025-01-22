@@ -1,65 +1,63 @@
 'use client';
 
-import { Button, Callout, TextField } from '@radix-ui/themes'
-import SimpleMDE from "react-simplemde-editor";
-import { useForm, Controller } from 'react-hook-form';
-import axios from 'axios';
-import "easymde/dist/easymde.min.css";
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { createTaskSchema } from '@/app/validationSchemas';
-import { z } from 'zod';
-import ErrorMessage from '@/app/components/ErrorMessage';
-import Spinner from '@/app/components/Spinner';
-
-type TaskForm = z.infer<typeof createTaskSchema>;
 
 const NewTaskPage = () => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<'OPEN' | 'IN_PROGRESS' | 'CLOSED'>('OPEN');
   const router = useRouter();
-  const {register, control, handleSubmit, formState: { errors }} = useForm<TaskForm>({
-    resolver: zodResolver(createTaskSchema)
-  });
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      setIsSubmitting(true);
-      await axios.post('/api/tasks', data);
-      router.push('/tasks')        
-    } catch (error) {
-      setIsSubmitting(false);
-      setError("An unexpected error has orrcured.")
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const response = await fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title, description, status }),
+    });
+
+    if (response.ok) {
+      router.push('/tasks');
+    } else {
+      console.error('Failed to create task');
     }
-  })
+  };
 
   return (
-    <div className='max-w-xl'>
-      {error && <Callout.Root color='red' className='mb-5'>
-        <Callout.Text>{error}</Callout.Text>
-      </Callout.Root>}
-      <form 
-        className='space-y-3' 
-        onSubmit={onSubmit}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Task title"
+        className="border p-2 w-full"
+        required
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Task description"
+        className="border p-2 w-full"
+        required
+      />
+      <select
+        value={status}
+        onChange={(e) => setStatus(e.target.value as 'OPEN' | 'IN_PROGRESS' | 'CLOSED')}
+        className="border p-2 w-full"
       >
-        <TextField.Root placeholder="Title" {...register('title')}/>
-          <ErrorMessage>
-            {errors.title?.message}
-          </ErrorMessage>
-        <Controller 
-          name='description'
-          control={control}
-          render={({ field }) => <SimpleMDE placeholder='Description' {...field}/>}
-        />
-          <ErrorMessage>
-            {errors.description?.message}
-          </ErrorMessage>
-        <Button disabled={isSubmitting}>
-          Submit New Task {isSubmitting && <Spinner/>}
-        </Button>
-      </form>
-    </div>
-  )
-}
+        <option value="OPEN">Open</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="CLOSED">Closed</option>
+      </select>
+      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+        Add Task
+      </button>
+    </form>
+  );
+};
 
-export default NewTaskPage
+export default NewTaskPage;
