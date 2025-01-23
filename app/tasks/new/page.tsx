@@ -32,7 +32,7 @@ const NewTaskPage = () => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Task title"
+          placeholder="Enter task here"
           className="border p-2 w-full"
           required
         />

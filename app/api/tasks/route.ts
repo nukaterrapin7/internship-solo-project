@@ -26,3 +26,22 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
     }
   }
+
+  export async function DELETE(request: NextRequest) {
+    try {
+        const { id } = await request.json();
+
+        if (!id) {
+            return NextResponse.json({ error: 'Task ID is required' }, { status: 400 });
+        }
+
+        const deletedTask = await prisma.task.delete({
+            where: { id: Number(id) },
+        });
+
+        return NextResponse.json(deletedTask, { status: 200 });
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        return NextResponse.json({ error: 'Failed to delete task' }, { status: 500 });
+    }
+}

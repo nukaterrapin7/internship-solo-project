@@ -15,7 +15,7 @@ const TasksPage = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const response = await fetch('/api/tasks'); // Replace with your actual API endpoint
+      const response = await fetch('/api/tasks');
       if (response.ok) {
         const data: Task[] = await response.json();
         setTasks(data);
@@ -26,6 +26,22 @@ const TasksPage = () => {
 
     fetchTasks();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    const response = await fetch('/api/tasks', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    if (response.ok) {
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    } else {
+      console.error('Failed to delete task');
+    }
+  };
 
   return (
     <div>
@@ -41,6 +57,12 @@ const TasksPage = () => {
               <p className="text-sm text-gray-500">
                 Created: {new Date(task.createdAt).toLocaleString()}
               </p>
+              <button
+                onClick={() => handleDelete(task.id)}
+                className="mt-2 bg-red-500 text-white p-2 rounded"
+              >
+                Delete
+              </button>
             </li>
           ))
         ) : (
