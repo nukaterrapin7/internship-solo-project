@@ -7,10 +7,7 @@ import { Button } from '@radix-ui/themes';
 type Task = {
   id: number;
   title: string;
-  description: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'CLOSED';
   createdAt: string;
-  updatedAt: string;
 };
 
 const TasksPage = () => {
@@ -41,13 +38,8 @@ const TasksPage = () => {
           tasks.map((task) => (
             <li key={task.id} className="border p-4 mb-4 rounded">
               <h2 className="text-lg font-bold">{task.title}</h2>
-              <p>{task.description}</p>
-              <p>Status: <strong>{task.status}</strong></p>
               <p className="text-sm text-gray-500">
                 Created: {new Date(task.createdAt).toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                Updated: {new Date(task.updatedAt).toLocaleString()}
               </p>
             </li>
           ))
