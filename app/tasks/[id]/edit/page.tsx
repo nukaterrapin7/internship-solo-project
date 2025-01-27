@@ -20,10 +20,7 @@ const EditTaskPage = () => {
     fetchTask();
   }, [id]);
 
-  const handleSave = async () => {
-    console.log("Save button clicked");
-    console.log('Sending PUT request to /api/tasks with data:', { id, title });
-    
+  const handleSave = async () => {    
     const response = await fetch("/api/tasks", {
       method: "PUT",
       headers: {

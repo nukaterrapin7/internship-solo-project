@@ -12,6 +12,7 @@ type Task = {
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [sortType, setSortType] = useState<'title' | 'date'>('date');
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -26,6 +27,21 @@ const TasksPage = () => {
 
     fetchTasks();
   }, []);
+
+  const sortTasks = (tasks: Task[], sortType: 'title' | 'date') => {
+    const tasksCopy = [...tasks];
+
+    if (sortType === 'title') {
+      return tasksCopy.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortType === 'date') {
+      return tasksCopy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    return tasksCopy;
+  };
+
+  const handleSortChange = (newSortType: 'title' | 'date') => {
+    setSortType(newSortType);
+  };
 
   const handleDelete = async (id: number) => {
     const response = await fetch('/api/tasks', {
@@ -45,31 +61,31 @@ const TasksPage = () => {
 
   return (
     <div>
-      <Button>
-        <Link href="/tasks/new">New Task</Link>
-      </Button>
+      
+      <Flex gap='3'>
+        <Button>
+          <Link href="/tasks/new">New Task</Link>
+        </Button>
+        <Button onClick={() => handleSortChange('title')}>Sort by Title</Button>
+        <Button onClick={() => handleSortChange('date')}>Sort by Date</Button>
+      </Flex>
       <h1 className="mt-4 text-2xl">Tasks</h1>
       <ul className="mt-4">
         {tasks.length > 0 ? (
-          tasks.map((task) => (
+          sortTasks(tasks, sortType).map((task) => (
             <li key={task.id} className="border p-4 mb-4 rounded">
               <h2 className="text-lg font-bold">{task.title}</h2>
               <p className="text-sm text-gray-500">
                 Created: {new Date(task.createdAt).toLocaleString()}
               </p>
-                <Flex gap='3'>
-                  <Button
-                    color='indigo'
-                  >
-                    <Link href={`/tasks/${task.id}/edit`}>Edit Task</Link>
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(task.id)}
-                    color='red'
-                  >
-                    Delete
-                  </Button>
-                </Flex>
+              <Flex gap="3">
+                <Button color="indigo">
+                  <Link href={`/tasks/${task.id}/edit`}>Edit Task</Link>
+                </Button>
+                <Button onClick={() => handleDelete(task.id)} color="red">
+                  Delete
+                </Button>
+              </Flex>
             </li>
           ))
         ) : (
