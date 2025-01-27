@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@radix-ui/themes';
+import { Button, Flex } from '@radix-ui/themes';
 
 type Task = {
   id: number;
@@ -57,12 +57,19 @@ const TasksPage = () => {
               <p className="text-sm text-gray-500">
                 Created: {new Date(task.createdAt).toLocaleString()}
               </p>
-              <button
-                onClick={() => handleDelete(task.id)}
-                className="mt-2 bg-red-500 text-white p-2 rounded"
-              >
-                Delete
-              </button>
+                <Flex gap='3'>
+                  <Button
+                    color='indigo'
+                  >
+                    <Link href={`/tasks/${task.id}/edit`}>Edit Task</Link>
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(task.id)}
+                    color='red'
+                  >
+                    Delete
+                  </Button>
+                </Flex>
             </li>
           ))
         ) : (
