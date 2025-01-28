@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import withAuth from '@/app/hoc/withAuth';
 
 const NewTaskPage = () => {
   const [title, setTitle] = useState('');
@@ -44,4 +45,4 @@ const NewTaskPage = () => {
   );
 };
 
-export default NewTaskPage;
+export default withAuth(NewTaskPage);

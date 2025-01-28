@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import withAuth from "@/app/hoc/withAuth";
 
 const EditTaskPage = () => {
   const { id } = useParams();
@@ -52,4 +53,4 @@ const EditTaskPage = () => {
   );
 };
 
-export default EditTaskPage;
+export default withAuth(EditTaskPage);

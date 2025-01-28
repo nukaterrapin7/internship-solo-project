@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Flex } from '@radix-ui/themes';
 
@@ -13,24 +14,39 @@ type Task = {
 const TasksPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [sortType, setSortType] = useState<'title' | 'date'>('date');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      const response = await fetch('/api/tasks');
-      if (response.ok) {
-        const data: Task[] = await response.json();
-        setTasks(data);
-      } else {
-        console.error('Failed to fetch tasks');
-      }
-    };
+    const storedUser = localStorage.getItem('mockUser');
+    if (!storedUser) {
+      router.push('/login');
+    } else {
+      setIsAuthenticated(true);
+    }
 
-    fetchTasks();
-  }, []);
+    setLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchTasks = async () => {
+        const response = await fetch('/api/tasks');
+        if (response.ok) {
+          const data: Task[] = await response.json();
+          setTasks(data);
+        } else {
+          console.error('Failed to fetch tasks');
+        }
+      };
+
+      fetchTasks();
+    }
+  }, [isAuthenticated]);
 
   const sortTasks = (tasks: Task[], sortType: 'title' | 'date') => {
     const tasksCopy = [...tasks];
-
     if (sortType === 'title') {
       return tasksCopy.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortType === 'date') {
@@ -59,10 +75,13 @@ const TasksPage = () => {
     }
   };
 
+  if (loading || isAuthenticated === null) {
+    return null;
+  }
+
   return (
     <div>
-      
-      <Flex gap='3'>
+      <Flex gap="3">
         <Button>
           <Link href="/tasks/new">New Task</Link>
         </Button>
